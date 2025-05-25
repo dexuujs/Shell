@@ -68,6 +68,22 @@ int parse_command_line(char *line_buffer, char *args[]) {
 }
 
 /**
+ * @brief Displays the help message for the simple shell.
+ */
+void display_help() {
+    printf("--- Simple Shell Help ---\n");
+    printf("Available built-in commands:\n");
+    printf("  help   : Display this help message.\n");
+    printf("  exit   : Terminate the shell.\n");
+    printf("\n");
+    printf("Other commands are executed via the system's PATH.\n");
+    printf("Examples:\n");
+    printf("  ls -l\n");
+    printf("  echo Hello World\n");
+    printf("-------------------------\n");
+}
+
+/**
  * @brief Executes a command with its arguments.
  *
  * This function forks a new process. The child process attempts to execute
@@ -84,12 +100,16 @@ void execute_command(char *args[]) {
         return; // No command entered, do nothing
     }
 
-    // Check for the built-in 'exit' command
+    // --- Handle built-in commands ---
     if (strcmp(args[0], "exit") == 0) {
         printf("Exiting simple_shell.\n");
         exit(0); // Terminate the shell
+    } else if (strcmp(args[0], "help") == 0) {
+        display_help(); // Call the help function
+        return; // Built-in command handled, return to shell loop
     }
 
+    // --- Execute external commands ---
     // Fork a new process
     pid = fork();
 
@@ -118,10 +138,6 @@ void execute_command(char *args[]) {
         if (waitpid(pid, &status, 0) == -1) {
             perror("waitpid error");
         }
-        // You can check the exit status of the child process if needed
-        // if (WIFEXITED(status)) {
-        //     printf("Child exited with status %d\n", WEXITSTATUS(status));
-        // }
     }
 }
 
